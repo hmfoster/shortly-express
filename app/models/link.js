@@ -2,6 +2,8 @@ var db = require('../config');
 var Click = require('./click');
 var crypto = require('crypto');
 
+//creates a model that is added to db table urls using Bookshelf
+//links to clicks table
 var Link = db.Model.extend({
   tableName: 'urls',
   hasTimestamps: true,

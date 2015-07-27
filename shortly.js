@@ -28,11 +28,13 @@ function(req, res) {
   res.render('index');
 });
 
+//takes you to link shortener--> How does this work?
 app.get('/create', 
 function(req, res) {
   res.render('index');
 });
 
+//renders a JSON array of shortened urls --> links.models
 app.get('/links', 
 function(req, res) {
   Links.reset().fetch().then(function(links) {
@@ -40,8 +42,10 @@ function(req, res) {
   });
 });
 
+//creates new shortened links
 app.post('/links', 
 function(req, res) {
+  //gets the url attribute from body of request
   var uri = req.body.url;
 
   if (!util.isValidUrl(uri)) {
@@ -49,6 +53,7 @@ function(req, res) {
     return res.send(404);
   }
 
+//Connects link to link model, hooking up to the db
   new Link({ url: uri }).fetch().then(function(found) {
     if (found) {
       res.send(200, found.attributes);
