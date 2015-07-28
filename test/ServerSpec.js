@@ -64,6 +64,7 @@ describe('', function() {
     var requestWithSession = request.defaults({jar: true});
 
     beforeEach(function(done){      // create a user that we can then log-in with
+      // console.log('New user beforeEach is running');
       new User({
           'username': 'Phillip',
           'password': 'Phillip'
@@ -155,6 +156,7 @@ describe('', function() {
 
       beforeEach(function(done){
         // save a link to the database
+        // console.log('Link creation beforeEach block is running');
         link = new Link({
           url: 'http://roflzoo.com/',
           title: 'Funny pictures of animals, funny dog pictures',

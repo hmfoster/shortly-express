@@ -19,6 +19,15 @@ var User = db.Model.extend({
       // set the user's password to this new encrypted hash
       model.set('password', util.passHash(model.get('password')));
     });
+  },
+
+  comparePass: function(pass) {
+    bcrypt.compare(pass, this.get('password'), function(err, res) {
+      if (err) {
+        console.log(err);
+      }
+      return res;
+    });
   }
 });
 

@@ -25,18 +25,28 @@ app.use(express.static(__dirname + '/public'));
 app.use(session({
   secret: 'preacalc wins',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
+  cookie: { secure: false }
 }));
 
 app.get('/', 
 function(req, res) {
-  res.render('index');
+  console.log("req.session.sessionID is:", req.session.sessionID);
+  if (req.session.sessionID) { ///CHANGED THIS
+    res.redirect('index');
+  } else {
+    res.redirect('login');
+  }
 });
 
 //takes you to link shortener--> How does this work?
 app.get('/create', 
 function(req, res) {
-  res.render('index');
+  if (req.session.sessionID) {
+    res.redirect('create');
+  } else {
+    res.redirect('login');
+  }
 });
 
 //dummy route for now
@@ -52,10 +62,14 @@ app.get('/signup',
 
 //renders a JSON array of shortened urls --> links.models
 app.get('/links', 
-function(req, res) {
-  Links.reset().fetch().then(function(links) {
-    res.send(200, links.models);
-  });
+  function(req, res) {
+    if (req.session.sessionID) {
+      Links.reset().fetch().then(function(links) {
+        res.send(200, links.models);
+      });
+    } else {
+      res.redirect('login');
+    }
 });
 
 //creates new shortened links
@@ -102,31 +116,20 @@ app.post('/login', function(req, res){
   //grab username and password from form field from request
   var username = req.body.username;
   var password = req.body.password;
-  console.log("USERNAME", username);
   //check if username exists in users database
-  if (util.isUserInDB(username)){ 
+  // if (util.isUserInDB(username)){ 
+  util.isUserInDB(username, function(model){
     //if yes, run entered password through bcrypt hash
-    var hash = util.passHash(password);
+    // var hash = util.passHash(password);
     //check if that matches hashed password in db
     //select password column where username = username
-
-    var userObj = Users.query(function(qb){
-      qb.where('username','=',username).andWhere('password','=',hash);
-    }).fetch();
-
-
-    //yes? redirect to index page
-    if (userObj){
-        //start a new session
-        req.session.regenerate(function(){
-          req.session.user = userObj.username;
-          res.redirect('index');
-        });
-        //grab links associated with that user to render to shortly page
-    }
-    else{
-      //no? prompt that password is incorrect and redirect to login page
-      console.log('Password rejected');
+    if(model.comparePass(password)) {
+      req.session.regenerate(function(){
+        req.session.user = userObj.username;
+        console.log("session", req.session.user);
+        res.redirect('index');
+      });
+    } else {
       res.redirect('login');
     }
 
