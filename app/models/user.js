@@ -1,6 +1,7 @@
 var db = require('../config');
 var bcrypt = require('bcrypt-nodejs');
 var Promise = require('bluebird');
+var util = require('../lib/utility');
 
 //how to encrypt password using bcrypt
 var User = db.Model.extend({
@@ -15,9 +16,8 @@ var User = db.Model.extend({
   initialize: function() {
     this.on('creating', function(model, attr){
       // bcrypt should make a hash for the user's password attribute
-      var hash = bcrypt.hashSync(model.get('password', 2));
       // set the user's password to this new encrypted hash
-      model.set('password', hash);
+      model.set('password', util.passHash(model.get('password')));
     });
   }
 });

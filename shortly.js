@@ -34,6 +34,17 @@ function(req, res) {
   res.render('index');
 });
 
+//dummy route for now
+app.get('/login', 
+  function(req, res){
+    res.render('login');
+  });
+
+app.get('/signup', 
+  function(req, res){
+    res.render('signup');
+  });
+
 //renders a JSON array of shortened urls --> links.models
 app.get('/links', 
 function(req, res) {
@@ -82,7 +93,58 @@ function(req, res) {
 /************************************************************/
 // Write your authentication routes here
 /************************************************************/
+app.post('/login', function(req, res){
+  //grab username and password from form field from request
+  var username = req.body.username;
+  var password = req.body.password;
+  console.log("USERNAME", username);
+  //check if username exists in users database
+  if (util.isUserInDB(username)){ 
+    //if yes, run entered password through bcrypt hash
+    var hash = util.passHash(password);
+    //check if that matches hashed password in db
+    //select password column where username = username
 
+    var userObj = Users.query(function(qb){
+      qb.where('username','=',username).andWhere('password','=',hash);
+    }).fetch();
+
+
+    //yes? redirect to index page
+    if (userObj){
+        //start a new session
+        req.session.regenerate(function(){
+          req.session.user = userObj.username;
+          res.redirect('index');
+        });
+        //grab links associated with that user to render to shortly page
+    }
+    else{
+      //no? prompt that password is incorrect and redirect to login page
+      console.log('Password rejected');
+      res.redirect('login');
+    }
+
+  }else{
+    //direct to signup page
+    res.redirect('signup');
+  }
+
+});
+
+
+app.post('/signup', function(req, res){
+  //grab username and password from form field from request
+  //check if username exists in users database
+    //if exists:
+      //return message that username is taken
+      //redirect to sign-up
+    //otherwise:
+      //run password through hash
+      //create new entry in users db with that username and hashed pw
+      //redirect to login page
+  
+});
 
 
 /************************************************************/
