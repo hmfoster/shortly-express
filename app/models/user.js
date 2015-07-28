@@ -1,7 +1,7 @@
 var db = require('../config');
 var bcrypt = require('bcrypt-nodejs');
 var Promise = require('bluebird');
-var util = require('../lib/utility');
+var util = require('../../lib/utility');
 
 //how to encrypt password using bcrypt
 var User = db.Model.extend({
