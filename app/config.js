@@ -45,5 +45,23 @@ db.knex.schema.hasTable('clicks').then(function(exists) {
 // Add additional schema definitions below
 /************************************************************/
 
+// User Table Schema (User has many links)
+  // Primary ID
+  // Username
+  // Password
+
+// for the users table, check whether it already exists
+db.knex.schema.hasTable('users').then(function(exists) {
+  if (!exists) {
+    // if not, create the table to begin with following our schema
+    db.knex.schema.createTable('users', function(user) {
+      user.increments('id').primary();
+      user.string('username', 50);
+      user.string('password', 50);
+    }).then(function (table) {
+      console.log('Created Users Table', table);
+    });
+  }
+});
 
 module.exports = db;
